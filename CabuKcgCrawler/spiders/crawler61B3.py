@@ -3,6 +3,7 @@ from scrapy.selector import Selector
 
 from CabuKcgCrawler.items import CabukcgcrawlerItem
 
+import io,json
 
 class CabuKcgCrawler61B3(Spider):
     name = "61B3"
@@ -20,41 +21,52 @@ class CabuKcgCrawler61B3(Spider):
         @scrapes name
         """
         sel = Selector(response)
+        items = []
 
         totalcols = 0
+        item = []
         headers = sel.xpath('//table[@id="dgPeopleStatis"]/tr[1]/th/text()')
-        print "-- Table headers --"
+        #print "-- Table headers --"
         for header in headers:
-            print header.extract()
-            totalcols = totalcols + 1
+        	item.append(header.extract())
+        	#print header.extract()
+        	totalcols = totalcols + 1
 
         dates = sel.xpath('//table[@id="dgPeopleStatis"]/tr/td[1]/font/span/text()')
         rols = sel.xpath('//table[@id="dgPeopleStatis"]/tr/td/text()')
-        print "Total Cols = ", totalcols
+        #print "Total Cols = ", totalcols
         i = 0
         dateIter = iter(dates)
-        print "-- Table content --"
+        #print "-- Table content --"
         for rol in rols:
         	if rol.extract().replace('\r','').replace('\n','').replace('\t','') != "":
         		#print "Col = ",i
         		if i % (totalcols-1) == 0:
+        			items.append(item)
+        			item = []
         			date = next(dateIter)
-        			print date.extract()
-        			print rol.extract()
+        			item.append(date.extract())
+        			#print date.extract()
+        			item.append(rol.extract())
+        			#print rol.extract()
         		else:
-        			print rol.extract()
+        			item.append(rol.extract())
+        			#print rol.extract()
         		i = i + 1
         	#else:
         	#	print "Remove: ",rol
 
-
-        items = []
+        #print json.dumps(items, ensure_ascii=False)
+        with io.open('data/61B3-json.txt', 'w', encoding='utf-8') as f:
+        	f.write(unicode(json.dumps(items, ensure_ascii=False)))
 
 #        for rol in rols:
 #            item = Website()
 #            item['name'] = site.xpath('a/text()').extract()
 #            item['url'] = site.xpath('a/@href').extract()
 #            item['description'] = site.xpath('text()').re('-\s([^\n]*?)\\n')
-#            items.append(item)
-
-        return items
+#            items.append(item)				
+				#print json.dumps(items, ensure_ascii=False)
+				#with io.open('data.txt', 'w', encoding='utf-8') as f:
+				#	f.write(unicode(json.dumps(items, ensure_ascii=False)))
+        return None
