@@ -39,6 +39,7 @@ class CabuKcgCrawlerDistrict(Spider):
 			villages = sel.xpath('//select[@id="ddlLi"]/option/@value').extract()
 			filterVillages = []
 			for village in villages:
+				village.strip()
 				if village != u'合計':
 					filterVillages.append(village)
 
@@ -59,4 +60,4 @@ class CabuKcgCrawlerDistrict(Spider):
 		def output(self):
 			print json.dumps(self.items, ensure_ascii=False)
 			with io.open('data/district.json', 'w', encoding='utf-8') as f:
-				f.write(unicode(json.dumps(self.items, ensure_ascii=False)))
+				f.write(unicode(json.dumps(self.items, indent=2, sort_keys=True, ensure_ascii=False)))
