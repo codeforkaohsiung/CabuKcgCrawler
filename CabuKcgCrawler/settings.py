@@ -15,3 +15,14 @@ NEWSPIDER_MODULE = 'CabuKcgCrawler.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'CabuKcgCrawler (+http://www.yourdomain.com)'
+#DEPTH_LIMIT = 1
+
+COOKIES_ENABLES = False
+
+#use new useragent
+DOWNLOADER_MIDDLEWARES = {
+        'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware' : None,
+        'CabuKcgCrawler.spiders.rotateUserAgent.RotateUserAgentMiddleware' :400
+}
+    		#'scrapy.contrib.downloadermiddleware.retry.RetryMiddleware': None,
+    		#'middlewares.MyRetryMiddleware': 500,
