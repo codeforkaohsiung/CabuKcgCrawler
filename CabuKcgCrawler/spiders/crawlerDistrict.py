@@ -5,7 +5,7 @@ from scrapy.selector import Selector
 
 from CabuKcgCrawler.items import CabukcgcrawlerItem
 
-import io,json,scrapy
+import io,json,scrapy,string
 
 class CabuKcgCrawlerDistrict(Spider):
 		name = "District"
@@ -39,6 +39,7 @@ class CabuKcgCrawlerDistrict(Spider):
 			villages = sel.xpath('//select[@id="ddlLi"]/option/@value').extract()
 			filterVillages = []
 			for village in villages:
+				village = string.replace(village, u'　', '')
 				village.strip()
 				if village != u'合計':
 					filterVillages.append(village)
