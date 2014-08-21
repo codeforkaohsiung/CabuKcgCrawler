@@ -1,25 +1,28 @@
 from scrapy.spider import Spider
 from scrapy.selector import Selector
 
-from CabuKcgCrawler.items import CabukcgcrawlerItem
+from CabuKcgCrawler.items import CabuKcgVillageData, CabuKcgVillageFactory
 
-import io,json
+import io,json,scrapy
 
 class CabuKcgCrawler61B3(Spider):
     name = "61B3"
-    allowed_domains = ["gov.tw"]
-    start_urls = [
-        "http://cabu.kcg.gov.tw/cabu2/statis61B3.aspx"
-    ]
+
+    def __init__(self):
+        self.allowed_domains = ["gov.tw"]
+        self.start_urls = [
+            "http://cabu.kcg.gov.tw/cabu2/statis61B3.aspx"
+        ]
+        self.districtsData = None
+        self.districtsKey = 0
 
     def parse(self, response):
-        """
-        The lines below is a spider contract. For more info see:
-        http://doc.scrapy.org/en/latest/topics/contracts.html
 
-        @url http://cabu.kcg.gov.tw/cabu2/statis61B3.aspx
-        @scrapes name
-        """
+        with io.open('data/district.json', 'r', encoding='utf-8') as f:
+            self.districtsData = json.load(f)
+            CabuKcgVillageFactory().loadFromJSON(self.districtsData)
+            #print self.districtsData
+
         sel = Selector(response)
         items = []
 
@@ -57,8 +60,8 @@ class CabuKcgCrawler61B3(Spider):
         	#	print "Remove: ",rol
 
         #print json.dumps(items, ensure_ascii=False)
-        with io.open('data/61B3-json.txt', 'w', encoding='utf-8') as f:
-        	f.write(unicode(json.dumps(items, ensure_ascii=False)))
+        #with io.open('data/61B3-json.txt', 'w', encoding='utf-8') as f:
+        #	f.write(unicode(json.dumps(items, ensure_ascii=False)))
 
 #        for rol in rols:
 #            item = Website()
@@ -69,4 +72,11 @@ class CabuKcgCrawler61B3(Spider):
 				#print json.dumps(items, ensure_ascii=False)
 				#with io.open('data.txt', 'w', encoding='utf-8') as f:
 				#	f.write(unicode(json.dumps(items, ensure_ascii=False)))
-        return None
+        return scrapy.FormRequest.from_response(
+            response,
+            formdata={'ddlArea': self.districtsData[0], 'LinkButton1': ''},
+            callback=self.submit_district
+        )
+
+    def submit_district(self, response):
+        pass
