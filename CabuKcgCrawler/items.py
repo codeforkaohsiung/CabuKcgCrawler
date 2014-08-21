@@ -15,7 +15,6 @@ class HasNextWrapper(object):
   def next(self):
     if self._hasnext:
       result = self._thenext
-      print "result = ", result
     else:
       result = next(self.it)
     
@@ -83,6 +82,7 @@ class CabuKcgVillageFactory:
       if it['district'] == district and it['village'] == village:
         it['headers'] = headers
         it['data'] = data
+        print it
         break
 
 
