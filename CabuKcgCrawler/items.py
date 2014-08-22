@@ -74,6 +74,7 @@ class CabuKcgVillageFactory:
     return self.processPoint.next()
 
   def printSelf(self):
+    print "OK, Let's print all object ==>"
     for item in self.items:
       print item
 
