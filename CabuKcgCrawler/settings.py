@@ -19,10 +19,16 @@ NEWSPIDER_MODULE = 'CabuKcgCrawler.spiders'
 
 COOKIES_ENABLES = False
 
+#LOG_LEVEL = 'INFO'
+
+ITEM_PIPELINES = {  
+  'CabuKcgCrawler.pipelines.JSONWritePipeline': 300
+} 
+
 #use new useragent
 DOWNLOADER_MIDDLEWARES = {
         'scrapy.contrib.downloadermiddleware.useragent.UserAgentMiddleware' : None,
-        'CabuKcgCrawler.spiders.rotateUserAgent.RotateUserAgentMiddleware' :400
+        'CabuKcgCrawler.spiders.rotateUserAgent.RotateUserAgentMiddleware' : 400
 }
     		#'scrapy.contrib.downloadermiddleware.retry.RetryMiddleware': None,
     		#'middlewares.MyRetryMiddleware': 500,

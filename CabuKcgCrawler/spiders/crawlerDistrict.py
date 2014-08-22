@@ -3,28 +3,24 @@
 from scrapy.spider import Spider
 from scrapy.selector import Selector
 
-from CabuKcgCrawler.items import CabukcgcrawlerItem
+from CabuKcgCrawler.items import CabuKcgDistrictItem
 
-import io,json,scrapy,string
+import scrapy
 
 class CabuKcgCrawlerDistrict(Spider):
 		name = "District"
+		allowed_domains = ["gov.tw"]
+		start_urls = ["http://cabu.kcg.gov.tw/cabu2/statis61B3.aspx"]
+		pipelines = ["JSONWritePipeline"]
 
 		def __init__(self):
-			self.allowed_domains = ["gov.tw"]
-			self.start_urls = ["http://cabu.kcg.gov.tw/cabu2/statis61B3.aspx"]
 			self.districts = []
 			self.districtsCount = 0
-			self.districtsTotal = 0
 			self.items = []
 
 		def parse(self, response):
 			sel = Selector(response)
 			self.districts = sel.xpath('//select[@id="ddlArea"]/option/@value').extract()
-
-			for district in self.districts:
-				self.districtsTotal = self.districtsTotal + 1
-				#print district
 
 			return scrapy.FormRequest.from_response(
     		response,
@@ -33,32 +29,26 @@ class CabuKcgCrawlerDistrict(Spider):
       )
 
 		def submit_district(self, response):
-			#print "Count = ", self.districtsCount, " Value = ", self.districts[self.districtsCount]
-
+			it = CabuKcgDistrictItem()
 			sel = Selector(response)
+
 			villages = sel.xpath('//select[@id="ddlLi"]/option/@value').extract()
 			filterVillages = []
 			for village in villages:
-				village = string.replace(village, u'　', '')
-				village.strip()
 				if village != u'合計':
 					filterVillages.append(village)
 
-			data = {self.districts[self.districtsCount]: filterVillages}
-			self.items.append(data)
+			it['district'] = self.districts[self.districtsCount]
+			it['villages'] = filterVillages
+
+			self.items.append(it)
 
 			self.districtsCount = self.districtsCount + 1
-			if self.districtsCount >= self.districtsTotal:
-				self.output()
-				return
+			if self.districtsCount >= len(self.districts):
+				return self.items
 
 			return scrapy.FormRequest.from_response(
     		response,
     		formdata={'ddlArea': self.districts[self.districtsCount], 'LinkButton1': ''},
     		callback=self.submit_district
       )
-
-		def output(self):
-			print json.dumps(self.items, ensure_ascii=False)
-			with io.open('data/district.json', 'w', encoding='utf-8') as f:
-				f.write(unicode(json.dumps(self.items, indent=2, sort_keys=True, ensure_ascii=False)))

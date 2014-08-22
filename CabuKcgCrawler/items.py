@@ -2,6 +2,18 @@
 
 
 from scrapy.item import Item, Field
+from patterns import Singleton
+
+import string
+
+class CabuKcgDistrictItem(Item):
+  district = Field()
+  villages = Field()
+
+  def stripData(self):
+    for v in self['villages']:
+      v = string.replace(v, u'　', '')
+      v.strip()
 
 
 class HasNextWrapper(object):
@@ -31,14 +43,6 @@ class HasNextWrapper(object):
     
     return self._hasnext
 
-class Singleton(type):
-  _instances = {}
-    
-  def __call__(cls, *args, **kwargs):
-    if cls not in cls._instances:
-      cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-    
-    return cls._instances[cls]
 
 class CabukcgcrawlerItem(Item):
   name = Field()
