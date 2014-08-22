@@ -12,14 +12,16 @@ A crawler for download cabu kaohsiung data.
 	```
 
 * use follow commands to prepare to run.
+ 
 	```bash
 	git submodule init
 	git submodule update
 	```
-* you can crawel data as follow.
+
+* you can crawel data as follow. all you crawel data will write to /data folder
+
 	```bash
 	scrapy list
 	scrapy crawel District
 	scrapy crawel 61B3
 	```
-all you crawel data will write to /data folder
