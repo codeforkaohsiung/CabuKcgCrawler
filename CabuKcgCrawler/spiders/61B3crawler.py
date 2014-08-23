@@ -4,7 +4,8 @@ from scrapy.spider import Spider
 from scrapy.selector import Selector
 from scrapy.shell import inspect_response
 
-from CabuKcgCrawler.items import CabuKcgVillageData, CabuKcgVillageFactory
+from CabuKcgCrawler.items import CabuKcgVillageData
+from CabuKcgCrawler.utils import CabuKcgVillageFactory
 
 import io,json,scrapy,cgi
 import HTMLParser

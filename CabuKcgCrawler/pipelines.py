@@ -15,10 +15,32 @@ class DistrictJSONWritePipeline(object):
 	def __init__(self):
 		self.rawItems = []
 		self.clearItems = []
+		self.SamiDistrict = []
+		self.FonsanDistrict = []
 
 	def process_item(self, item, spider):
 		if 'DistrictJSONWritePipeline' not in getattr(spider, 'pipelines'):
 			log.msg('[DistrictJSONWritePipeline] Skip', level=log.DEBUG)
+			return item
+
+		if u'三民' in item['district']:
+			if item['district'] != u'三民區':
+				it = {'district': item['district'], 'villages': item['villages']}
+				self.rawItems.append(it)
+			
+			item.stripData()
+			for v in item['villages']:
+				self.SamiDistrict.append(v)
+			return item
+
+		if u'鳳山' in item['district']:
+			it = {'district': item['district'], 'villages': item['villages']}
+			self.rawItems.append(it)
+
+			item.stripData()
+			for v in item['villages']:
+				log.msg('Village: [{0}]'.format(v.encode('utf-8')), level=log.DEBUG)
+				self.FonsanDistrict.append(v)
 			return item
 
 		log.msg('[DistrictJSONWritePipeline] Process...', level=log.DEBUG)
@@ -32,6 +54,13 @@ class DistrictJSONWritePipeline(object):
 		return item
 
 	def close_spider(self, spider):
+		it = {'district': u'三民區', 'villages': self.SamiDistrict}
+		self.clearItems.append(it)
+
+
+		it = {'district': u'鳳山區', 'villages': self.FonsanDistrict}
+		self.clearItems.append(it)
+
 		log.msg('[DistrictJSONWritePipeline] spider is close.', level=log.INFO)
 		with io.open('data/raw/district.json', 'w', encoding='utf-8') as f:
 			f.write(unicode(json.dumps(self.rawItems, indent=2, sort_keys=True, ensure_ascii=False)))
