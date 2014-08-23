@@ -11,7 +11,7 @@ class CabuKcgCrawlerDistrict(Spider):
 		name = "District"
 		allowed_domains = ["gov.tw"]
 		start_urls = ["http://cabu.kcg.gov.tw/cabu2/statis61B3.aspx"]
-		pipelines = ["JSONWritePipeline"]
+		pipelines = ["DistrictJSONWritePipeline"]
 
 		def __init__(self):
 			self.districts = []

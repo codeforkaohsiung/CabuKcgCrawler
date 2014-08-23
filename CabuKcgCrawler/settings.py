@@ -22,7 +22,7 @@ COOKIES_ENABLES = False
 #LOG_LEVEL = 'INFO'
 
 ITEM_PIPELINES = {  
-  'CabuKcgCrawler.pipelines.JSONWritePipeline': 300
+  'CabuKcgCrawler.pipelines.DistrictJSONWritePipeline': 300
 } 
 
 #use new useragent
