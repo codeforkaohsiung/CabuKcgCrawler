@@ -10,6 +10,8 @@ import string
 class CabuKcgDistrictItem(Item):
   district = Field()
   villages = Field()
+  header = Field()
+  data = Field()
 
   def stripData(self):
     items = []
@@ -23,7 +25,10 @@ class CabuKcgDistrictItem(Item):
 
     self['villages'] = items
 
+  def __str__(self):
+    return '[{0} - {1}] Data => {2}'.format(unicode(self['district']).encode('utf-8'), unicode(self['village']).encode('utf-8'), self['data'])
 
+    
 class CabuKcgVillageData(Item):
   district = Field()
   village = Field()

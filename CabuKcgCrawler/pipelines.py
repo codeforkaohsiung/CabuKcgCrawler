@@ -18,9 +18,15 @@ class DistrictJSONWritePipeline(object):
 		self.SamiDistrict = []
 		self.FonsanDistrict = []
 
+	def isExecute(self, spider):
+		if 'DistrictJSONWritePipeline' in getattr(spider, 'pipelines'):
+			log.msg('[DistrictJSONWritePipeline] is skip this step.', level=log.DEBUG)
+			return True
+
+		return False
+
 	def process_item(self, item, spider):
-		if 'DistrictJSONWritePipeline' not in getattr(spider, 'pipelines'):
-			log.msg('[DistrictJSONWritePipeline] Skip', level=log.DEBUG)
+		if self.isExecute(spider) is not True:
 			return item
 
 		if u'三民' in item['district']:
@@ -43,7 +49,7 @@ class DistrictJSONWritePipeline(object):
 				self.FonsanDistrict.append(v)
 			return item
 
-		log.msg('[DistrictJSONWritePipeline] Process...', level=log.DEBUG)
+		log.msg('[DistrictJSONWritePipeline] Process JSON Output...', level=log.DEBUG)
 		it = {'district': item['district'], 'villages': item['villages']}
 		self.rawItems.append(it)
 		
@@ -54,6 +60,9 @@ class DistrictJSONWritePipeline(object):
 		return item
 
 	def close_spider(self, spider):
+		if self.isExecute(spider) is not True:
+			return item
+
 		it = {'district': u'三民區', 'villages': self.SamiDistrict}
 		self.clearItems.append(it)
 

@@ -2,6 +2,17 @@
 
 
 from patterns import Singleton
+from scrapy import log
+
+import pprint
+
+
+class CabuKcgDataItem():
+  district = None
+  village = None
+  headers = None
+  data = None
+
 
 class HasNextWrapper(object):
 
@@ -37,20 +48,18 @@ class CabuKcgVillageFactory:
     self.items = []
     self.processPoint = None
 
-  def loadFromJSON(self, villages):
-    for district in villages:
-      keys = district.iterkeys()
-      
-      for key in keys:
-        for v in district[key]:
-          item = CabuKcgVillageData()
-          item['district'] = key
-          item['village'] = v
-          item['headers'] = None
-          item['data'] = None
-          self.items.append(item)
+  def loadFromJSON(self, jsons):
+    for js in jsons:
+      district = js['district']
+      villages = js['villages']
 
-      self.processPoint = HasNextWrapper(self.items)    
+      for v in villages:
+        item = CabuKcgDataItem()
+        item.district = district
+        item.village = v
+        self.items.append(item)
+
+    self.processPoint = HasNextWrapper(self.items)    
 
   def hasNext(self):
     return self.processPoint.hasNext()
@@ -65,8 +74,9 @@ class CabuKcgVillageFactory:
 
   def fillOfData(self, district, village, headers, data):
     for it in self.items:
-      if it['district'] == district and it['village'] == village:
-        it['headers'] = headers
-        it['data'] = data
-        print it
+      if it.district == district and it.village == village:
+        it.headers = headers
+        it.data = data
+        pp = pprint.PrettyPrinter()
+        pp.pprint(it.data)
         break
