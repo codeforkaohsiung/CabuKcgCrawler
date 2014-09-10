@@ -68,15 +68,16 @@ class CabuKcgVillageFactory:
     return self.processPoint.next()
 
   def printSelf(self):
+    pp = pprint.PrettyPrinter()
     print "OK, Let's print all object ==>"
     for item in self.items:
-      print item
+      print "[",item.district," (",item.village,") ]"
+      pp.pprint(item.headers)
+      pp.pprint(item.data)
 
   def fillOfData(self, district, village, headers, data):
     for it in self.items:
       if it.district == district and it.village == village:
         it.headers = headers
         it.data = data
-        pp = pprint.PrettyPrinter()
-        pp.pprint(it.data)
         break

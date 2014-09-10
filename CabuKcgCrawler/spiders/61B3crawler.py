@@ -19,7 +19,7 @@ class CabuKcgCrawler61B3(Spider):
   start_urls = [
     "http://cabu.kcg.gov.tw/cabu2/statis61B3.aspx"
   ]
-  pipelines = []
+  pipelines = ["C61B3JSONWritePipeline"]
 
   def __init__(self):
     self.districtItems = []
@@ -36,14 +36,12 @@ class CabuKcgCrawler61B3(Spider):
     #  CabuKcgVillageFactory().printSelf()
       return None
 
-    self.districtData = CabuKcgVillageFactory().next()
-
-    #if self.districtData['district'] == u'小港區':
-    #  if self.districtData['village'] == u'宏亮里' or self.districtData['village'] == u'店鎮里' or self.districtData['village'] == u'松金里' or self.districtData['village'] == u'桂林里' or self.districtData['village'] == u'廈莊里' or self.districtData['village'] == u'鳳宮里' or self.districtData['village'] == u'鳳源里' or self.districtData['village'] == u'鳳興里' or self.districtData['village'] == u'濟南里':
+    if self.districtData != None and self.districtData.district == u'小港區':
+      if self.districtData.village == u'宏亮里' or self.districtData.village == u'店鎮里' or self.districtData.village == u'松金里' or self.districtData.village == u'桂林里' or self.districtData.village == u'廈莊里' or self.districtData.village == u'鳳宮里' or self.districtData.village == u'鳳源里' or self.districtData.village == u'鳳興里' or self.districtData.village == u'濟南里　':
     #    inspect_response(response)
     #    self.addSuffixes()
-        #self.districtData = CabuKcgVillageFactory().next()
-        #self.districtData['village'] = self.districtData['village'] + u'　'
+        self.districtData = CabuKcgVillageFactory().next()
+        #self.districtData.village = self.districtData.village + u'　'
 
     #if self.districtData['district'] == u'鳳山二':
     #  if self.districtData['village'] == u'二甲里' or self.districtData['village'] == u'中民里' or self.districtData['village'] == u'中榮里' or self.districtData['village'] == u'天興里' or self.districtData['village'] == u'武漢里' or self.districtData['village'] == u'保安里' or self.districtData['village'] == u'南和里' or self.districtData['village'] == u'國光里' or self.districtData['village'] == u'國富里' or self.districtData['village'] == u'富甲里' or self.districtData['village'] == u'善美里' or self.districtData['village'] == u'新武里' or self.districtData['village'] == u'新強里' or self.districtData['village'] == u'新樂里' or self.districtData['village'] == u'福祥里' or self.districtData['village'] == u'福興里' or self.districtData['village'] == u'鎮南里':
@@ -83,12 +81,16 @@ class CabuKcgCrawler61B3(Spider):
         #self.districtData['village'] = self.districtData['village'] + u'　'
 
 
+
+
+    self.districtData = CabuKcgVillageFactory().next()
+
     if self.currentDistrict == None or self.currentDistrict != self.districtData.district:
       self.currentDistrict = self.districtData.district
       return scrapy.FormRequest.from_response(
         response,
         formdata={'ddlArea': self.currentDistrict, 'LinkButton1': ''},
-        callback=self.next
+        callback=self.changeDistrict
       )
 
     #print "ddlArea = [",self.districtData['district'],"] ddlLi = [", self.districtData['village'], "]. "
@@ -107,16 +109,27 @@ class CabuKcgCrawler61B3(Spider):
             callback=self.submit
     )
 
-  def addSuffixes(self):
-    self.districtData['village'] = self.districtData['village'] + u'　'
+  def changeDistrict(self, response):
+    #print "ddlArea = [",self.districtData['district'],"] ddlLi = [", self.districtData['village'], "]. "
+
+    html_parser = HTMLParser.HTMLParser()
+    print "ddlArea = [",self.districtData.district,"] ddlLi = [",self.districtData.village, "]. "
+    #inspect_response(response)
+
+    return scrapy.FormRequest.from_response(
+            response,
+            formname="Form1",
+            dont_click=True,
+            formdata={'ddlArea': self.districtData.district, 'ddlLi': self.districtData.village},
+            clickdata={'name': "btnSearch"},
+            meta={'http-equiv': "Content-Type", 'content': "text/html; charset: UTF-8"},
+            callback=self.submit
+    )    
 
   def parse(self, response):
     with io.open('data/raw/district.json', 'r', encoding='utf-8') as f:
       CabuKcgVillageFactory().loadFromJSON(json.load(f))
       f.close()
-    return self.next(response)
-
-  def submitDistrict(self, response):
     return self.next(response)
 
   def submit(self, response):

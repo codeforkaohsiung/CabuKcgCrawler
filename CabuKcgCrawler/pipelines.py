@@ -6,6 +6,7 @@
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
 from scrapy import log
+from CabuKcgCrawler.utils import CabuKcgVillageFactory
 
 import io,json
 
@@ -61,7 +62,7 @@ class DistrictJSONWritePipeline(object):
 
 	def close_spider(self, spider):
 		if self.isExecute(spider) is not True:
-			return item
+			return None
 
 		it = {'district': u'三民區', 'villages': self.SamiDistrict}
 		self.clearItems.append(it)
@@ -76,3 +77,30 @@ class DistrictJSONWritePipeline(object):
 
 		with io.open('data/clear/district.json', 'w', encoding='utf-8') as f:
 			f.write(unicode(json.dumps(self.clearItems, indent=2, sort_keys=True, ensure_ascii=False)))
+
+
+class C61B3JSONWritePipeline(object):
+	name = "C61B3JSONWritePipeline"
+
+	def __init__(self):
+		self.rawItems = []
+		self.clearItems = []
+		self.SamiDistrict = []
+		self.FonsanDistrict = []
+
+	def isExecute(self, spider):
+		if 'C61B3JSONWritePipeline' in getattr(spider, 'pipelines'):
+			log.msg('[C61B3JSONWritePipeline] is skip this step.', level=log.DEBUG)
+			return True
+
+		return False
+
+	def process_item(self, item, spider):
+		if self.isExecute(spider) is not True:
+			return item
+
+	def close_spider(self, spider):
+		if self.isExecute(spider) is not True:
+			return None
+
+		CabuKcgVillageFactory().printSelf()
